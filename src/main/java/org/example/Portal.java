@@ -5,6 +5,19 @@ import java.util.List;
 
 public class Portal {
     private VehicleManager vehicleManager;
+    private PaymentProcessor paymentProcessor;
+
+    private static Portal portal;
+
+    private Portal(VehicleManager vehicleManager) {
+        this.vehicleManager = vehicleManager;
+    }
+
+    public static Portal getInstance(VehicleManager vehicleManager) {
+        if(portal == null)
+            return new Portal(vehicleManager);
+        return portal;
+    }
 
     public void search(VehicleType vehicleType) {
         List<Vehicle> vehicleList = vehicleManager.findVehicle(vehicleType);
@@ -13,13 +26,23 @@ public class Portal {
 
     }
 
-    public Booking reserve(Vehicle vehicle, LocalDateTime startDateTime, LocalDateTime endDateTime, PaymentStrategy paymentStrategy) {
+    public Booking reserve(Vehicle vehicle, LocalDateTime startDateTime, LocalDateTime endDateTime) {
         if(vehicle.getIsAvailable())
         {
-            return new Booking(vehicle, startDateTime, endDateTime, paymentStrategy);
+
+            Booking booking = new Booking(vehicle, startDateTime, endDateTime);
+            booking.setBookingStatus(BookingStatus.IN_PROGRESS);
+            return booking;
         }
 
-
         return null;
+    }
+
+    public void makePayment(Booking booking, PaymentStrategy paymentStrategy, double amount) {
+        boolean paymentSuccess = paymentProcessor.pay(paymentStrategy, amount);
+        if(paymentSuccess)
+            booking.setBookingStatus(BookingStatus.CONFIRMED);
+        else
+            booking.setBookingStatus(BookingStatus.FAILED);
     }
 }

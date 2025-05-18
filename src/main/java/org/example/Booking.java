@@ -11,18 +11,17 @@ public class Booking {
     private LocalDateTime bookingStartTime;
     private LocalDateTime bookingEndTime;
     private double amount;
-    private PaymentStrategy paymentStrategy;
+    private BookingStatus bookingStatus;
 
-    public Booking(Vehicle vehicle, LocalDateTime bookingStartTime, LocalDateTime bookingEndTime, PaymentStrategy paymentStrategy) {
+    public Booking(Vehicle vehicle, LocalDateTime bookingStartTime, LocalDateTime bookingEndTime) {
         this.bookingId = String.valueOf(new Random().nextInt(100000));
         this.vehicle = vehicle;
         this.bookingStartTime = bookingStartTime;
         this.bookingEndTime = bookingEndTime;
-        this.paymentStrategy = paymentStrategy;
+        this.amount = abs(bookingEndTime.getHour() - bookingStartTime.getHour()) * vehicle.getCostPerHour();
     }
 
-    public void calculateFare() {
-       this.amount = abs(bookingEndTime.getHour() - bookingStartTime.getHour()) * vehicle.getCostPerHour();
+    public void setBookingStatus(BookingStatus bookingStatus) {
+        this.bookingStatus = bookingStatus;
     }
-
 }
